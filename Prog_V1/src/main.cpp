@@ -76,8 +76,44 @@ void autonomous() {}
  */
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
+	pros::Motor left_mtr2(1, pro::E_Motor_Gear_06,false) // port 2, blue gearbox, not reversed
+	pros::Motor left_mtr3(2, pro::E_Motor_Gear_06,false) // port 3, blue gearbox, not reversed
+	pros::Motor Topleft_mtr(3, pro::E_Motor_Gear_06,false) // port 1, blue gearbox, not reversed
+	pros::Motor right_mtr2(4, pro::E_Motor_Gear_06, true) // port 5, blue gearbox, reversed
+	pros::Motor right_mtr3(5, pro::E_Motor_Gear_06, true) // port 6, blue gearbox, reversed
+	pros::Motor Topright_mtr1(6, pro::E_Motor_Gear_06,true) // port 4, blue gearbox, reversed    
+
+	pros::MotorGroup  left_side_motors({left_mtr2,left_mtr3, Topleft_mtr})
+	pros::MotorGroup  right_side_motors({right_mtr2,right_mtr3, Topright_mtr})
+
+	lemlib::Drivetrain_t drivetrain {
+		&leftMotors, // left drivetrain motors
+		&rightMotors // right drivetrain motors
+		13, // track widith
+		3.25, // wheel diameter
+		360 // wheel rpm
+	};
+	
+	// forward/bakcward PID
+	lemlib::ChassisController_t lateralController {
+		8, // kP
+		30, // kD
+		1, // smallErrorTimeout
+		3, // largeErorRange
+		500, // largeEroorTimeout
+		5 // slew rate
+	};
+
+	// turning PID
+	lemlib::ChassisController_t angularController {
+		4, // kP
+		40, // kD
+		1, // smallErrorRange
+		100, // smallErrorTimeout
+		3, // largeErrorRange
+		500, // largeErrorTimeout
+		0 // slew rate
+	};
 
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
