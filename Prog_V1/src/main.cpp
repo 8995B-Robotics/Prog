@@ -1,6 +1,7 @@
 #include "main.h"
 #include "lemlib/api.hpp"
-
+	
+ 
 /**
  * A callback function for LLEMU's center button.
  *
@@ -24,9 +25,9 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
-
+	pros::lcd;;initialize(); // initialize brain screen
+	chassis.calibrate(); // calibrate the chassis
+	
 	pros::lcd::register_btn1_cb(on_center_button);
 }
 
@@ -75,16 +76,17 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr2(1, pro::E_Motor_Gear_06,false) // port 2, blue gearbox, not reversed
-	pros::Motor left_mtr3(2, pro::E_Motor_Gear_06,false) // port 3, blue gearbox, not reversed
-	pros::Motor Topleft_mtr(3, pro::E_Motor_Gear_06,false) // port 1, blue gearbox, not reversed
-	pros::Motor right_mtr2(4, pro::E_Motor_Gear_06, true) // port 5, blue gearbox, reversed
-	pros::Motor right_mtr3(5, pro::E_Motor_Gear_06, true) // port 6, blue gearbox, reversed
-	pros::Motor Topright_mtr1(6, pro::E_Motor_Gear_06,true) // port 4, blue gearbox, reversed    
+ 	pros::Controller master(pros::E_CONTROLLER_MASTER);
+	pros::Motor left_mtr2(1, pro::E_Motor_Gear_06,false); // port 2, blue gearbox, not reversed
+	pros::Motor left_mtr3(2, pro::E_Motor_Gear_06,false); // port 3, blue gearbox, not reversed
+	pros::Motor Topleft_mtr(3,pro::E_Motor_Gear_06,false); // port 1, blue gearbox, not reversed
+	pros::Motor right_mtr2(4, pro::E_Motor_Gear_06, true); // port 5, blue gearbox, reversed
+	pros::Motor right_mtr3(5, pro::E_Motor_Gear_06, true); // port 6, blue gearbox, reversed
+	pros::Motor Topright_mtr1(6,pro::E_Motor_Gear_06,true); // port 4, blue gearbox, reversed 
 
-	pros::MotorGroup  left_side_motors({left_mtr2,left_mtr3, Topleft_mtr})
-	pros::MotorGroup  right_side_motors({right_mtr2,right_mtr3, Topright_mtr})
+
+	pros::MotorGroup  left_side_motors({left_mtr2, left_mtr3, Topleft_mtr});
+	pros::MotorGroup  right_side_motors({right_mtr2, right_mtr3, Topright_mtr});
 
 	lemlib::Drivetrain_t drivetrain {
 		&leftMotors, // left drivetrain motors
@@ -93,7 +95,23 @@ void opcontrol() {
 		3.25, // wheel diameter
 		360 // wheel rpm
 	};
+
 	
+
+	
+	// inertial struct
+	pros::Imu inertial_sensor(14); // originally was 2 but changed to 14
+
+	// odometry struct 
+	lemlib:OdomSensors_t sensors {
+		nullptr, // No tracking wheels
+		nullptr, // No tracking wheels
+		nullptr, // No tracking wheels
+		nullptr, // No tracking wheels
+		&inertial_sensor // inertial sensor
+	}
+
+
 	// forward/bakcward PID
 	lemlib::ChassisController_t lateralController {
 		8, // kP
@@ -125,6 +143,6 @@ void opcontrol() {
 		left_mtr = left;
 		right_mtr = right;
 
-		pros::delay(20);
+		pros::delay(10); // Delay was originally 20 but no was changed to 10
 	}
 }
