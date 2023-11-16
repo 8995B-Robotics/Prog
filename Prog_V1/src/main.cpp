@@ -21,7 +21,7 @@ pros::Motor Motor5(5, pros::E_MOTOR_GEARSET_06, true);
 pros::Motor Motor6(6, pros::E_MOTOR_GEARSET_06, false);
 
 pros::Motor Intake(20, pros::E_MOTOR_GEARSET_06, false);
-pros::Motor Catapult(11, pros::E_MOTOR_GEARSET_36, false);
+pros::Motor Catapult(11, pros::E_MOTOR_GEARSET_36, true);
 
 pros::Controller master (CONTROLLER_MASTER);
  
@@ -106,7 +106,7 @@ void opcontrol() {
     int turn = master.get_analog(ANALOG_LEFT_Y);
 
 
-    if (master.get_digital(DIGITAL_R2)) {
+    if (master.get_digital(DIGITAL_L2)) {
       Catapult = 127;
     }
     else {
