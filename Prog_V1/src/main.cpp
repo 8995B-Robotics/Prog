@@ -1,12 +1,7 @@
 #include "main.h"
 #include "lemlib/api.hpp"
 	
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
+
 void on_center_button() {
 	static bool pressed = false;
 	pressed = !pressed;
@@ -18,12 +13,15 @@ void on_center_button() {
 }
 
 	// drivetrain motors
-pros::Motor Motor1(1, pros::E_MOTOR_GEARSET_06, true); 
-pros::Motor Motor2(2, pros::E_MOTOR_GEARSET_06, false); 
-pros::Motor Motor3(3, pros::E_MOTOR_GEARSET_06, false); 
-pros::Motor Motor4(4, pros::E_MOTOR_GEARSET_06, false);
-pros::Motor Motor5(5, pros::E_MOTOR_GEARSET_06, false); 
-pros::Motor Motor6(6, pros::E_MOTOR_GEARSET_06, true);
+pros::Motor Motor1(1, pros::E_MOTOR_GEARSET_06, false); 
+pros::Motor Motor2(2, pros::E_MOTOR_GEARSET_06, true); 
+pros::Motor Motor3(3, pros::E_MOTOR_GEARSET_06, true); 
+pros::Motor Motor4(4, pros::E_MOTOR_GEARSET_06, true);
+pros::Motor Motor5(5, pros::E_MOTOR_GEARSET_06, true); 
+pros::Motor Motor6(6, pros::E_MOTOR_GEARSET_06, false);
+
+pros::Motor Intake(20, pros::E_MOTOR_GEARSET_06, false);
+pros::Motor Catapult(11, pros::E_MOTOR_GEARSET_36, false);
 
 pros::Controller master (CONTROLLER_MASTER);
  
@@ -104,8 +102,16 @@ void autonomous() {
 
 void opcontrol() {
   while (true) {
-    int power = master.get_analog(ANALOG_LEFT_Y);
-    int turn = master.get_analog(ANALOG_LEFT_X);
+    int power = master.get_analog(ANALOG_LEFT_X);
+    int turn = master.get_analog(ANALOG_LEFT_Y);
+
+
+    if (master.get_digital(DIGITAL_R2)) {
+      Catapult = 127;
+    }
+    else {
+      Catapult = 0;
+    }
 
     int left = power + turn;
     int right = power - turn;
