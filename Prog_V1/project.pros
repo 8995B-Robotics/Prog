@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "Prog_V1",
+    "project_name": "Prog_V2",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -190,9 +190,10 @@
       }
     },
     "upload_options": {
-      "icon": "pizza",
+      "icon": "alien",
       "after": "none",
-      "description": "Blaze: 8995B"
+      "description": "Blaze: 8995B",
+      "slot": 2
     }
   }
 }
