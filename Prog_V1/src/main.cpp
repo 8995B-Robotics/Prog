@@ -20,14 +20,14 @@ pros::Motor Motor4(4, pros::E_MOTOR_GEARSET_06, true);
 pros::Motor Motor5(5, pros::E_MOTOR_GEARSET_06, true); 
 pros::Motor Motor6(6, pros::E_MOTOR_GEARSET_06, false);
 
+    // Subsystem Motors
 pros::Motor Intake(20, pros::E_MOTOR_GEARSET_06, false);
 pros::Motor Catapult(11, pros::E_MOTOR_GEARSET_36, true);
-bool CataOn = false;
 
-pros::ADIDigitalIn LimitSwitch ('B'); // Limit on 3-Wire port B
-bool LimitOn = false;
+    //All sensors
 pros::Optical OpticalSens(19, 50); // Port 19, delay 50ms
-
+pros::ADIDigitalIn LimitSwitch ('B'); // Limit on 3-Wire port B
+bool LimitOn = false; // Boolean for the catapult auto-reload
 
 pros::Controller master (CONTROLLER_MASTER);
  
@@ -78,7 +78,7 @@ lemlib::ChassisController_t angularController {
 };
  
  
-// create the chassis
+// create the chassis for LemLib Autonomous
 lemlib::Chassis chassis(drivetrain, lateralController, angularController, sensors);
 
 void screen() {
@@ -108,49 +108,36 @@ void autonomous() {
 
 void opcontrol() {    
   while (true) {
-    int power = master.get_analog(ANALOG_LEFT_X);
+    // Set variables, like controller inputs 
+    int power = master.get_analog(ANALOG_LEFT_X); 
     int turn = master.get_analog(ANALOG_LEFT_Y);
     bool LimitOn = false;
-/*
-    if(OpticalSens.get_hue() > 55 && OpticalSens.get_hue() < 85) {
-        OpticalDetected = true;
-    } else {
-        OpticalDetected = false;
-    }
-*/
 
+// Catapult code
 if(master.get_digital(DIGITAL_L2)) {
-    Catapult = 105;
-} else if(OpticalSens.get_hue() > 55 && OpticalSens.get_hue() < 85) {
-    Catapult = 105;
+    Catapult = 105; // If we press L2, it shoots the catapult
+    LimitOn = false; // Also resets the auto-reload
+} else if(OpticalSens.get_hue() > 55 && OpticalSens.get_hue() < 100) {
+    Catapult = 105; // Shoots if it detects a triball in the low-arc area
+    LimitOn = false;
 } else {
     if(LimitSwitch.get_value() == 0) {
         if(LimitOn == false) {
-            Catapult = 105;
+            Catapult = 105; // Pulls catapult back until it hits the limit switch
         } else {
-            Catapult = 0;
+            Catapult = 0; // Stops catapult
+            LimitOn = true; // Makes sure it doesn't continue moving until it shoots
         }
     } else {
-        Catapult = 0;
+        Catapult = 0; // If none of the conditions are somehow met, just don't move the catapult
     }
 }
-
-
-     // master.get_digital(DIGITAL_L2) && !&& OpticalSens.get_hue() < 55 && OpticalSens.get_hue() > 85
-      // else if(master.get_digital(DIGITAL_L2) && LimitSwitch.get_value() && OpticalSens.get_hue() < 55 && OpticalSens.get_hue() > 85) {
-        // Catapult = 0;
-    //}  else if(master.get_digital(DIGITAL_L2) && !LimitSwitch.get_value() && OpticalSens.get_hue() > 55 && OpticalSens.get_hue() < 85) {
-       //  Catapult = 105;
-    //}  else {
-     //    Catapult = 0;
-   // }
-
+    // Set controller inputs into the drive sides
     int left = power + turn;
     int right = power - turn;
     left_side_motors.move(left);
     right_side_motors.move(right);
     
-    LimitOn = 0;
-    pros::delay(2);
+    pros::delay(2); // Delay so that the program doesn't draw too much memory and checks
   }
 }
