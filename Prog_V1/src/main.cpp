@@ -26,9 +26,8 @@ bool CataOn = false;
 
 pros::ADIDigitalIn LimitSwitch ('B'); // Limit on 3-Wire port B
 bool LimitOn = false;
-
 pros::Optical OpticalSens(19, 50); // Port 19, delay 50ms
-bool OpticalDetected = false;
+
 
 pros::Controller master (CONTROLLER_MASTER);
  
@@ -111,51 +110,47 @@ void opcontrol() {
   while (true) {
     int power = master.get_analog(ANALOG_LEFT_X);
     int turn = master.get_analog(ANALOG_LEFT_Y);
-
-    if(LimitSwitch.get_value() == 1) {
-        LimitOn = true;
-    } else if(LimitSwitch.get_value() == 0) {
-        LimitOn = false;
-    }
-
+    bool LimitOn = false;
+/*
     if(OpticalSens.get_hue() > 55 && OpticalSens.get_hue() < 85) {
         OpticalDetected = true;
     } else {
         OpticalDetected = false;
     }
-
-
-    if (master.get_digital(DIGITAL_B)) { // If L2 is pressed, then the cata is on
-        if(CataOn == true) {
-            CataOn = false;
-        } else if(CataOn == false) {
-            CataOn = true;
-        }
-    }
-
-    while (CataOn && !LimitOn) { // While Cata is on, and limit switch isn't pressed
-            Catapult = 105; // Spin cata back
-        }
-
-        if(CataOn && LimitOn && !OpticalDetected) {
-            Catapult = 0;
-        } else if(CataOn && OpticalDetected && LimitOn) {
-            while (LimitOn){ // Spin until limit switch isn't pressed (catapult is fired)
-                Catapult = 105;
-            }
-        }
-/*
-    if(CataOn && OpticalDetected && LimitOn) { // Only fire if cata is on, there is a triball detected, and the limitswitch is pressed
-            while (LimitSwitch.get_value() == 1){ // Spin until limit switch isn't pressed (catapult is fired)
-                Catapult = 105;
-            }
-        }
 */
+
+if(master.get_digital(DIGITAL_L2)) {
+    Catapult = 105;
+} else if(OpticalSens.get_hue() > 55 && OpticalSens.get_hue() < 85) {
+    Catapult = 105;
+} else {
+    if(LimitSwitch.get_value() == 0) {
+        if(LimitOn == false) {
+            Catapult = 105;
+        } else {
+            Catapult = 0;
+        }
+    } else {
+        Catapult = 0;
+    }
+}
+
+
+     // master.get_digital(DIGITAL_L2) && !&& OpticalSens.get_hue() < 55 && OpticalSens.get_hue() > 85
+      // else if(master.get_digital(DIGITAL_L2) && LimitSwitch.get_value() && OpticalSens.get_hue() < 55 && OpticalSens.get_hue() > 85) {
+        // Catapult = 0;
+    //}  else if(master.get_digital(DIGITAL_L2) && !LimitSwitch.get_value() && OpticalSens.get_hue() > 55 && OpticalSens.get_hue() < 85) {
+       //  Catapult = 105;
+    //}  else {
+     //    Catapult = 0;
+   // }
+
     int left = power + turn;
     int right = power - turn;
     left_side_motors.move(left);
     right_side_motors.move(right);
-
+    
+    LimitOn = 0;
     pros::delay(2);
   }
 }
