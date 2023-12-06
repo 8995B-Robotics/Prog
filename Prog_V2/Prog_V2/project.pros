@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "Blue_Off",
+    "project_name": "Dual Stick",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -346,8 +346,9 @@
       }
     },
     "upload_options": {
-      "description": "Blue Offensive Zone",
-      "slot": 4
+      "description": "Ehh not event too bad ngl",
+      "slot": 1,
+      "icon": "ufo"
     }
   }
 }

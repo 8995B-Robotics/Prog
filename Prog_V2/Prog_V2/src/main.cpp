@@ -39,10 +39,10 @@ pros::MotorGroup right_side_motors({Motor4, Motor5, Motor6});
 lemlib::Drivetrain drivetrain(
     &left_side_motors, // left drive motors
     &right_side_motors, // right drive motors
-    13, // track width
+    12.25, // track width
     lemlib::Omniwheel::NEW_325, // using new 3.25" omnis
     360, // drivetrain rpm is 360
-    8 // 2 = allOmni, 8 = w/ traction
+    2 // Omni vs Traction?
 );
  
 // inertial sensor
@@ -97,78 +97,65 @@ void screen() {
 void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate the chassis
-	chassis.setPose(-35, 64, 0); // X, Y, Heading
+	chassis.setPose(0, 0, 0); // X, Y, Heading
     pros::Task screenTask(screen); // create a task to print the position to the screen
+
+    Intake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 }
 
 void disabled() {}
 
-// Blue Offense paths
-
-// Name is "B" for Blue
-// "O" for offensive
-// "04" is how many triballs we want to score
-// "0.." is the number of the path
-// Has to be "_txt" because then c++ is happy 
-
-ASSET(BO4B00_txt); 
-ASSET(BO4B01_txt);
-ASSET(BO4B02_txt);
-ASSET(BO4B03_txt);
-ASSET(BO4B04_txt);
-ASSET(BO4B05_txt);
-ASSET(BO4B06_txt);
-ASSET(BO4B07_txt);
-ASSET(BO4B08_txt);
-ASSET(BO4B09_txt);
-
 
 void autonomous() {
-// Blue Offensive zone (Top Left)
-
-chassis.follow(BO4B00_txt, 10, 4000, false); // Path File, Lookahead, Timeout, backwards or not
-pros::delay(40); // Triball rolls on floor
-chassis.follow(BO4B01_txt, 10, 4000, false); // move to middle triball
-Intake = 105; // grab triball #1
-chassis.follow(BO4B02_txt, 10, 4000, true); // move triball with intake down
-chassis.turnTo(-50, 12, 1000, true, 60); // turn around
-Intake = -105; // let go of triball
-pros::delay(30);
-Intake = 0;
-chassis.follow(BO4B03_txt, 10, 4000, false); // ram triball into goal
-chassis.follow(BO4B04_txt, 10, 4000, true); // drive to second triball
-chassis.turnTo(-4, 0, 1000, true, 60); // turn around to triball
-chassis.follow(BO4B05_txt, 10, 4000, false); // get closer to second triball
-Intake = 105; // grab triball #2
-chassis.follow(BO4B06_txt, 10, 4000, true); // drive with it close to goal
-chassis.turnTo(-50, 12, 1000, true, 60); // turn around
-Intake = -105; // let go of triball
-pros::delay(30);
-Intake = 0;
-chassis.follow(BO4B07_txt, 10, 4000, false); // ram triball #2 into goal
-chassis.follow(BO4B08_txt, 10, 4000, true); // drive to push the preload into the goal
-chassis.follow(BO4B09_txt, 10, 4000, false); // move to the horizontal elevation bar
-Intake = 105; // Touch the bar with intake
+chassis.turnTo(10, 0, 0, 800); 
 }
 
 void opcontrol() {    
   while (true) {
+    int PowerLeft = master.get_analog(ANALOG_LEFT_X); 
+    int TurnLeft = master.get_analog(ANALOG_LEFT_Y);
+
+    int PowerRight = master.get_analog(ANALOG_RIGHT_X); 
+    int TurnRight = master.get_analog(ANALOG_RIGHT_Y);
+
     // Set variables, like controller inputs 
-    int power = master.get_analog(ANALOG_LEFT_X); 
-    int turn = master.get_analog(ANALOG_LEFT_Y);
+    // int power = master.get_analog(ANALOG_LEFT_X); 
+    // int turn = master.get_analog(ANALOG_LEFT_Y);
     bool LimitOn = false;
+
+    if(master.get_digital(DIGITAL_R2)) {
+        Intake = 105;
+    } else if(master.get_digital(DIGITAL_R1)) {
+        Intake = -105;
+    } else {
+        Intake = 0;
+    }
 
 // Catapult code
 if(master.get_digital(DIGITAL_L2)) {
-    Catapult = 105; // If we press L2, it shoots the catapult
+    Catapult = 127; // If we press L2, it shoots the catapult
     LimitOn = false; // Also resets the auto-reload
-} else if(OpticalSens.get_hue() > 55 && OpticalSens.get_hue() < 100) {
-    Catapult = 105; // Shoots if it detects a triball in the low-arc area
+
+} else if(OpticalSens.get_hue() > 50 && OpticalSens.get_hue() < 130) { // GREEN TRIBALL
+    Catapult = 127; // Shoots if it detects a triball in the low-arc area
     LimitOn = false;
+
+} else if(OpticalSens.get_hue() > 200 && OpticalSens.get_hue() < 230) {// BLUE TRIBALL
+    Catapult = 127; 
+    LimitOn = false;
+
+} else if(OpticalSens.get_hue() > 300 && OpticalSens.get_hue() < 359) { // RED TRIBALL #1
+    Catapult = 127; 
+    LimitOn = false;
+
+} else if(OpticalSens.get_hue() > 0 && OpticalSens.get_hue() < 8) { // RED TRIBALL #2
+    Catapult = 127; 
+    LimitOn = false;
+    
 } else {
-    if(LimitSwitch.get_value() == 0) {
+    if(LimitSwitch.get_value() == 0) { 
         if(LimitOn == false) {
-            Catapult = 105; // Pulls catapult back until it hits the limit switch
+            Catapult = 127; // Pulls catapult back until it hits the limit switch
         } else {
             Catapult = 0; // Stops catapult
             LimitOn = true; // Makes sure it doesn't continue moving until it shoots
@@ -177,9 +164,15 @@ if(master.get_digital(DIGITAL_L2)) {
         Catapult = 0; // If none of the conditions are somehow met, just don't move the catapult
     }
 }
+
     // Set controller inputs into the drive sides
-    int left = power + turn;
-    int right = power - turn;
+    // int left = power + turn;
+    // int right = power - turn;
+    // left_side_motors.move(left);
+    // right_side_motors.move(right);
+
+    int left = PowerLeft + TurnLeft;
+    int right = PowerRight - TurnRight;
     left_side_motors.move(left);
     right_side_motors.move(right);
     
