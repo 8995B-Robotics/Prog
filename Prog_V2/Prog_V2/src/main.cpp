@@ -107,7 +107,9 @@ void disabled() {}
 
 
 void autonomous() {
-chassis.turnTo(10, 0, 0, 800); 
+chassis.turnTo(45, -45, 1000, true, 60);
+chassis.turnTo(0, 10, 1000, true, 60);
+chassis.moveTo(0, 110, 0, 4000);
 }
 
 void opcontrol() {    
