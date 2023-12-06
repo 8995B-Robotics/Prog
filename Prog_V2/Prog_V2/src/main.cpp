@@ -171,6 +171,8 @@ if(master.get_digital(DIGITAL_L2)) {
     // left_side_motors.move(left);
     // right_side_motors.move(right);
 
+
+    //Dual stick
     int left = PowerLeft + TurnLeft;
     int right = PowerRight - TurnRight;
     left_side_motors.move(left);
