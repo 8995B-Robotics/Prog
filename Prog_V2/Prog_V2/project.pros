@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "Dual Stick",
+    "project_name": "SPIN TEST (Single)",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -346,9 +346,9 @@
       }
     },
     "upload_options": {
-      "description": "Ehh not event too bad ngl",
-      "slot": 1,
-      "icon": "ufo"
+      "description": "spin",
+      "slot": 3,
+      "icon": "power"
     }
   }
 }

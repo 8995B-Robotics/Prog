@@ -17,9 +17,10 @@ void on_center_button() {
 pros::Motor Motor1(1, pros::E_MOTOR_GEARSET_06, false); 
 pros::Motor Motor2(2, pros::E_MOTOR_GEARSET_06, true); 
 pros::Motor Motor3(3, pros::E_MOTOR_GEARSET_06, true); 
-pros::Motor Motor4(4, pros::E_MOTOR_GEARSET_06, true);
-pros::Motor Motor5(5, pros::E_MOTOR_GEARSET_06, true); 
-pros::Motor Motor6(6, pros::E_MOTOR_GEARSET_06, false);
+
+pros::Motor Motor4(4, pros::E_MOTOR_GEARSET_06, false);
+pros::Motor Motor5(5, pros::E_MOTOR_GEARSET_06, false); 
+pros::Motor Motor6(6, pros::E_MOTOR_GEARSET_06, true);
 
     // Subsystem Motors
 pros::Motor Intake(20, pros::E_MOTOR_GEARSET_06, false);
@@ -107,22 +108,36 @@ void disabled() {}
 
 
 void autonomous() {
-chassis.turnTo(45, -45, 1000, true, 60);
 chassis.turnTo(0, 10, 1000, true, 60);
-chassis.moveTo(0, 110, 0, 4000);
+chassis.moveTo(0, 10, 0, 4000);
+chassis.turnTo(0, 0, 1000, true, 60);
+chassis.moveTo(0, 0, 0, 4000);
+chassis.turnTo(0, 10, 1000, true, 60);
 }
 
 void opcontrol() {    
   while (true) {
-    int PowerLeft = master.get_analog(ANALOG_LEFT_X); 
-    int TurnLeft = master.get_analog(ANALOG_LEFT_Y);
+    // Dual stick OLD
+    // int PowerLeft = master.get_analog(ANALOG_LEFT_X); 
+    // int TurnLeft = master.get_analog(ANALOG_LEFT_Y);
+    // int PowerRight = master.get_analog(ANALOG_RIGHT_X); 
+    // int TurnRight = master.get_analog(ANALOG_RIGHT_Y);
 
-    int PowerRight = master.get_analog(ANALOG_RIGHT_X); 
-    int TurnRight = master.get_analog(ANALOG_RIGHT_Y);
-
-    // Set variables, like controller inputs 
+    // Single stick OLD
     // int power = master.get_analog(ANALOG_LEFT_X); 
     // int turn = master.get_analog(ANALOG_LEFT_Y);
+
+
+    //single stick
+    int Left_Y = master.get_analog(ANALOG_LEFT_Y); 
+    int Left_X  = master.get_analog(ANALOG_LEFT_X);
+    chassis.arcade(Left_Y, Left_X);
+    
+    //dual stick
+    // int Left_Y = master.get_analog(ANALOG_LEFT_Y); 
+    // int Right_X  = master.get_analog(ANALOG_RIGHT_X);
+    // chassis.arcade(Left_Y, Right_X);
+
     bool LimitOn = false;
 
     if(master.get_digital(DIGITAL_R2)) {
@@ -138,7 +153,7 @@ if(master.get_digital(DIGITAL_L2)) {
     Catapult = 127; // If we press L2, it shoots the catapult
     LimitOn = false; // Also resets the auto-reload
 
-} else if(OpticalSens.get_hue() > 50 && OpticalSens.get_hue() < 130) { // GREEN TRIBALL
+} else if(OpticalSens.get_hue() > 90 && OpticalSens.get_hue() < 130) { // GREEN TRIBALL
     Catapult = 127; // Shoots if it detects a triball in the low-arc area
     LimitOn = false;
 
@@ -167,19 +182,19 @@ if(master.get_digital(DIGITAL_L2)) {
     }
 }
 
-    // Set controller inputs into the drive sides
+    // Single stick OLD
     // int left = power + turn;
     // int right = power - turn;
     // left_side_motors.move(left);
     // right_side_motors.move(right);
 
 
-    //Dual stick
-    int left = PowerLeft + TurnLeft;
-    int right = PowerRight - TurnRight;
-    left_side_motors.move(left);
-    right_side_motors.move(right);
+    //Dual stick OLD
+    // int left = PowerLeft + TurnLeft;
+    // int right = PowerRight - TurnRight;
+    // left_side_motors.move(left);
+    // right_side_motors.move(right);
     
-    pros::delay(2); // Delay so that the program doesn't draw too much memory and checks
+    pros::delay(10); // Brain only updates every 10 ms
   }
 }
