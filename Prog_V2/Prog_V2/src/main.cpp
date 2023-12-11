@@ -1,5 +1,6 @@
 #include "main.h"
 #include "lemlib/api.hpp"
+#include "autoSelect/selection.h"
 
 	
 
@@ -60,18 +61,18 @@ lemlib::OdomSensors sensors {
  
 // forward/backward PID
 lemlib::ControllerSettings linearController {
-    8, // kP
-    30, // kD
+    12, // kP was 8, 12 is nice
+    35, // kD was 30
     1, // smallErrorRange
     100, // smallErrorTimeout
     3, // largeErrorRange
     500, // largeErrorTimeout
-    5 // slew rate
+    10 // slew rate
 };
  
 // turning PID
 lemlib::ControllerSettings angularController {
-    4, // kP
+    6, // kP was 4
     40, // kD
     1, // smallErrorRange
     100, // smallErrorTimeout
@@ -102,41 +103,74 @@ void initialize() {
     pros::Task screenTask(screen); // create a task to print the position to the screen
 
     Intake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    selector::init();
 }
 
 void disabled() {}
 
+ASSET(jerry_txt);
+
 
 void autonomous() {
-chassis.turnTo(0, 10, 1000, true, 60);
+if(selector::auton == 1){ //Offense Red 
 chassis.moveTo(0, 10, 0, 4000);
-chassis.turnTo(0, 0, 1000, true, 60);
-chassis.moveTo(0, 0, 0, 4000);
-chassis.turnTo(0, 10, 1000, true, 60);
+}
+
+if(selector::auton == 2){ //Defense Red 
+chassis.moveTo(10, 0, 0, 4000);
+}
+
+if(selector::auton == 3){ //Offence AWP Red 
+chassis.moveTo(30, 30, 0, 4000);
+}
+
+if(selector::auton == -1){ //Offense Blue 
+chassis.turnTo(10, 0, 1000, false, 60);
+}
+
+if(selector::auton == -2){ //Defense Blue 
+chassis.turnTo(-10, 0, 1000, false, 60);
+}
+
+if(selector::auton == -3){ //Offense AWP Blue 
+chassis.turnTo(0, -10, 1000, false, 60);
+}
+
+if(selector::auton == 0){ //Skills 
+chassis.turnTo(-10, 0, 1000, false, 60);
+pros::delay(10);
+chassis.turnTo(0, -10, 1000, false, 60);
+pros::delay(10);
+chassis.turnTo(10, 0, 1000, false, 60);
+pros::delay(10);
+chassis.turnTo(0, 10, 1000, false, 60);
+}
 }
 
 void opcontrol() {    
   while (true) {
-    // Dual stick OLD
-    // int PowerLeft = master.get_analog(ANALOG_LEFT_X); 
-    // int TurnLeft = master.get_analog(ANALOG_LEFT_Y);
-    // int PowerRight = master.get_analog(ANALOG_RIGHT_X); 
-    // int TurnRight = master.get_analog(ANALOG_RIGHT_Y);
-
-    // Single stick OLD
-    // int power = master.get_analog(ANALOG_LEFT_X); 
-    // int turn = master.get_analog(ANALOG_LEFT_Y);
-
 
     //single stick
     int Left_Y = master.get_analog(ANALOG_LEFT_Y); 
     int Left_X  = master.get_analog(ANALOG_LEFT_X);
-    chassis.arcade(Left_Y, Left_X);
+
+    int CurveYPrep = pow(Left_Y, 3);
+    int CurveY = CurveYPrep/10000;
+    int CurveXPrep = pow(Left_X, 3);
+    int CurveX = CurveXPrep/10000;
+
+    chassis.arcade(CurveY, CurveX);
     
     //dual stick
     // int Left_Y = master.get_analog(ANALOG_LEFT_Y); 
     // int Right_X  = master.get_analog(ANALOG_RIGHT_X);
     // chassis.arcade(Left_Y, Right_X);
+
+    //tank drive
+    // int Left_Y = master.get_analog(ANALOG_LEFT_Y); 
+    // int Right_Y  = master.get_analog(ANALOG_RIGHT_Y);
+    // left_side_motors.move(Left_Y);
+    // right_side_motors.move(Right_Y);
 
     bool LimitOn = false;
 
@@ -154,18 +188,22 @@ if(master.get_digital(DIGITAL_L2)) {
     LimitOn = false; // Also resets the auto-reload
 
 } else if(OpticalSens.get_hue() > 90 && OpticalSens.get_hue() < 130) { // GREEN TRIBALL
+    pros::delay(40); // Delay so we don't hit our hand
     Catapult = 127; // Shoots if it detects a triball in the low-arc area
     LimitOn = false;
 
 } else if(OpticalSens.get_hue() > 200 && OpticalSens.get_hue() < 230) {// BLUE TRIBALL
+    pros::delay(40);
     Catapult = 127; 
     LimitOn = false;
 
 } else if(OpticalSens.get_hue() > 300 && OpticalSens.get_hue() < 359) { // RED TRIBALL #1
+    pros::delay(40);
     Catapult = 127; 
     LimitOn = false;
 
 } else if(OpticalSens.get_hue() > 0 && OpticalSens.get_hue() < 8) { // RED TRIBALL #2
+     pros::delay(40);
     Catapult = 127; 
     LimitOn = false;
     

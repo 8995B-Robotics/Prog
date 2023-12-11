@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "SPIN TEST (Single)",
+    "project_name": "Single Stick",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -40,6 +40,22 @@
         "target": "v5",
         "user_files": [],
         "version": "0.5.0-rc1"
+      },
+      "autoSelect": {
+        "location": "/Users/makeroni/Library/Application Support/PROS/templates/autoSelect@2.1.4",
+        "metadata": {
+          "origin": "local"
+        },
+        "name": "autoSelect",
+        "py/object": "pros.conductor.templates.local_template.LocalTemplate",
+        "supported_kernels": "^3.2.1",
+        "system_files": [
+          "include\\autoSelect\\selection.h",
+          "firmware\\autoSelect.a"
+        ],
+        "target": "v5",
+        "user_files": [],
+        "version": "2.1.4"
       },
       "kernel": {
         "location": "/Users/makeroni/Library/Application Support/PROS/templates/kernel@3.8.0",
@@ -346,9 +362,9 @@
       }
     },
     "upload_options": {
-      "description": "spin",
-      "slot": 3,
-      "icon": "power"
+      "description": "single >>>",
+      "icon": "pizza",
+      "slot": 1
     }
   }
 }
