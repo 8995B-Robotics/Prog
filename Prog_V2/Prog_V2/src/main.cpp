@@ -121,18 +121,17 @@ chassis.turnTo(-48, -48, 1000, true, 60);
 chassis.moveTo(-48, -48, 135, 4000, true, 0.0, 0.001);
 pros::delay(20);
 chassis.turnTo(50, -8, 1000, false, 60);
-// tested until here
 
 chassis.moveTo(-60, -51, 250, 4000, true, 0.0, 0.001);
-Intake = 105;
-pros::delay(100);
+Intake = 105; 
+pros::delay(100); // failed here, need longer time delay
 Intake = 0;
 
 Catapult = 127;
 pros::delay(42000);
 Catapult = 0;
 
-chassis.turnTo(-36, -60, 1000, true, 60);
+chassis.turnTo(-36, -60, 1000, true, 60); // failed here, went into goal???
 chassis.moveTo(-36, -60, 120, 4000, true, 0.0, 0.001);
 chassis.turnTo(35, -60, 1000, true, 60);
 chassis.moveTo(42, -60, 90, 4000, true, 0.0, 0.001);
