@@ -31,6 +31,7 @@ pros::Motor Catapult(11, pros::E_MOTOR_GEARSET_36, true);
 pros::Optical OpticalSens(19, 50); // Port 19, delay 50ms
 pros::ADIDigitalIn LimitSwitch ('B'); // Limit on 3-Wire port B
 bool LimitOn = false; // Boolean for the catapult auto-reload
+bool CataOn = true;
 
 pros::Controller master (CONTROLLER_MASTER);
  
@@ -99,52 +100,50 @@ void screen() {
 void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate the chassis
-	chassis.setPose(0, 0, 0); // X, Y, Heading
+	chassis.setPose(-36, -60, 0); // X, Y, Heading
+    //lemlib::Pose pose(-36, -60, 315);
     pros::Task screenTask(screen); // create a task to print the position to the screen
 
     Intake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    selector::init();
+    //selector::init();
 }
 
 void disabled() {}
 
-ASSET(jerry_txt);
-
 
 void autonomous() {
-if(selector::auton == 1){ //Offense Red 
-chassis.moveTo(0, 10, 0, 4000);
-}
+chassis.turnTo(-60, -36, 1000, true, 60); // true = face that direction w/ front of bot
+chassis.moveTo(-60, -36, 315, 4000);
+chassis.turnTo(-60, 24, 1000, true, 60);
+chassis.moveTo(-60, -24, 0, 4000);
+chassis.moveTo(-60, -36, 0, 4000, false); // false = not forward
+chassis.turnTo(-48, -48, 1000, true, 60);
+chassis.moveTo(-48, -48, 135, 4000, true, 0.0, 0.001);
+pros::delay(20);
+chassis.turnTo(50, -8, 1000, false, 60);
+// tested until here
 
-if(selector::auton == 2){ //Defense Red 
-chassis.moveTo(10, 0, 0, 4000);
-}
+chassis.moveTo(-60, -51, 250, 4000, true, 0.0, 0.001);
+Intake = 105;
+pros::delay(100);
+Intake = 0;
 
-if(selector::auton == 3){ //Offence AWP Red 
-chassis.moveTo(30, 30, 0, 4000);
-}
+Catapult = 127;
+pros::delay(42000);
+Catapult = 0;
 
-if(selector::auton == -1){ //Offense Blue 
-chassis.turnTo(10, 0, 1000, false, 60);
-}
-
-if(selector::auton == -2){ //Defense Blue 
-chassis.turnTo(-10, 0, 1000, false, 60);
-}
-
-if(selector::auton == -3){ //Offense AWP Blue 
-chassis.turnTo(0, -10, 1000, false, 60);
-}
-
-if(selector::auton == 0){ //Skills 
-chassis.turnTo(-10, 0, 1000, false, 60);
-pros::delay(10);
-chassis.turnTo(0, -10, 1000, false, 60);
-pros::delay(10);
-chassis.turnTo(10, 0, 1000, false, 60);
-pros::delay(10);
-chassis.turnTo(0, 10, 1000, false, 60);
-}
+chassis.turnTo(-36, -60, 1000, true, 60);
+chassis.moveTo(-36, -60, 120, 4000, true, 0.0, 0.001);
+chassis.turnTo(35, -60, 1000, true, 60);
+chassis.moveTo(42, -60, 90, 4000, true, 0.0, 0.001);
+chassis.turnTo(48, -48, 1000, true, 60);
+chassis.moveTo(48, -48, 45, 4000, true, 0.0, 0.001);
+chassis.turnTo(10, 0, 1000, true, 60);
+chassis.moveTo(10, 0, 315, 4000, true, 0.0, 0.001);
+chassis.turnTo(50, 0, 1000, true, 60);
+chassis.moveTo(50, 0, 90, 4000, true, 0.0, 0.001);
+chassis.moveTo(10, -10, 60, 4000, false, 0.0, 0.001);
+chassis.moveTo(44, -12, 75, 4000, true, 0.0, 0.001);
 }
 
 void opcontrol() {    
@@ -187,51 +186,48 @@ if(master.get_digital(DIGITAL_L2)) {
     Catapult = 127; // If we press L2, it shoots the catapult
     LimitOn = false; // Also resets the auto-reload
 
-} else if(OpticalSens.get_hue() > 90 && OpticalSens.get_hue() < 130) { // GREEN TRIBALL
+} else if(OpticalSens.get_hue() > 100 && OpticalSens.get_hue() < 140) { // GREEN TRIBALL
+if (CataOn == true) {
     pros::delay(40); // Delay so we don't hit our hand
     Catapult = 127; // Shoots if it detects a triball in the low-arc area
     LimitOn = false;
-
+}
 } else if(OpticalSens.get_hue() > 200 && OpticalSens.get_hue() < 230) {// BLUE TRIBALL
+if (CataOn == true) {
     pros::delay(40);
     Catapult = 127; 
     LimitOn = false;
-
+}
 } else if(OpticalSens.get_hue() > 300 && OpticalSens.get_hue() < 359) { // RED TRIBALL #1
+if (CataOn == true) {
     pros::delay(40);
     Catapult = 127; 
     LimitOn = false;
-
+}
 } else if(OpticalSens.get_hue() > 0 && OpticalSens.get_hue() < 8) { // RED TRIBALL #2
+if (CataOn == true) {
      pros::delay(40);
     Catapult = 127; 
     LimitOn = false;
-    
-} else {
+}
+} else if (master.get_digital(DIGITAL_B)) {
+    CataOn = false;
+} else if(master.get_digital(DIGITAL_X)) {
+CataOn = true;
+}else {
     if(LimitSwitch.get_value() == 0) { 
+        if (CataOn == true) {
         if(LimitOn == false) {
             Catapult = 127; // Pulls catapult back until it hits the limit switch
         } else {
             Catapult = 0; // Stops catapult
             LimitOn = true; // Makes sure it doesn't continue moving until it shoots
         }
+        }
     } else {
         Catapult = 0; // If none of the conditions are somehow met, just don't move the catapult
     }
 }
-
-    // Single stick OLD
-    // int left = power + turn;
-    // int right = power - turn;
-    // left_side_motors.move(left);
-    // right_side_motors.move(right);
-
-
-    //Dual stick OLD
-    // int left = PowerLeft + TurnLeft;
-    // int right = PowerRight - TurnRight;
-    // left_side_motors.move(left);
-    // right_side_motors.move(right);
     
     pros::delay(10); // Brain only updates every 10 ms
   }
