@@ -100,7 +100,7 @@ void screen() {
 void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate the chassis
-	chassis.setPose(-36, -60, 0); // X, Y, Heading
+	chassis.setPose(0, 0, 0); // X, Y, Heading
     //lemlib::Pose pose(-36, -60, 315);
     pros::Task screenTask(screen); // create a task to print the position to the screen
 
@@ -110,39 +110,12 @@ void initialize() {
 
 void disabled() {}
 
+ASSET(example_txt);
 
 void autonomous() {
-chassis.turnTo(-60, -36, 1000, true, 60); // true = face that direction w/ front of bot
-chassis.moveTo(-60, -36, 315, 4000);
-chassis.turnTo(-60, 24, 1000, true, 60);
-chassis.moveTo(-60, -24, 0, 4000);
-chassis.moveTo(-60, -36, 0, 4000, false); // false = not forward
-chassis.turnTo(-48, -48, 1000, true, 60);
-chassis.moveTo(-48, -48, 135, 4000, true, 0.0, 0.001);
-pros::delay(20);
-chassis.turnTo(50, -8, 1000, false, 60);
-
-chassis.moveTo(-60, -51, 250, 4000, true, 0.0, 0.001);
-Intake = 105; 
-pros::delay(100); // failed here, need longer time delay
-Intake = 0;
-
-Catapult = 127;
-pros::delay(42000);
-Catapult = 0;
-
-chassis.turnTo(-36, -60, 1000, true, 60); // failed here, went into goal???
-chassis.moveTo(-36, -60, 120, 4000, true, 0.0, 0.001);
-chassis.turnTo(35, -60, 1000, true, 60);
-chassis.moveTo(42, -60, 90, 4000, true, 0.0, 0.001);
-chassis.turnTo(48, -48, 1000, true, 60);
-chassis.moveTo(48, -48, 45, 4000, true, 0.0, 0.001);
-chassis.turnTo(10, 0, 1000, true, 60);
-chassis.moveTo(10, 0, 315, 4000, true, 0.0, 0.001);
-chassis.turnTo(50, 0, 1000, true, 60);
-chassis.moveTo(50, 0, 90, 4000, true, 0.0, 0.001);
-chassis.moveTo(10, -10, 60, 4000, false, 0.0, 0.001);
-chassis.moveTo(44, -12, 75, 4000, true, 0.0, 0.001);
+chassis.waitUntilDone();
+chassis.follow(example_txt, 15, 4000, false);
+chassis.waitUntilDone();
 }
 
 void opcontrol() {    
