@@ -153,7 +153,7 @@ void autonomous() {
 // chassis.moveTo(46, 10, 0, 4000, true);
 // ----------------------------------------------------------------------------------------
 // Red but on blue side: yeet triball at goal + touch bar + 2 in goal
-// start at (-60,-36) heading 235 and preload in low-arc
+// start at (-60,-36) heading 235 and preload in low-arc platfrorm
 Intake = 105;
 pros::delay(100);
 Intake = 0;
