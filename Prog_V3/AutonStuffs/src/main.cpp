@@ -99,8 +99,7 @@ void screen() {
 void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate the chassis
-	chassis.setPose(-36, -60, 235); // X, Y, Heading
-    //lemlib::Pose pose(-36, -60, 315);
+	chassis.setPose(36, -60, 0); // X, Y, Heading
     pros::Task screenTask(screen); // create a task to print the position to the screen
 
     Intake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -112,94 +111,34 @@ void disabled() {}
 ASSET(example_txt);
 
 void autonomous() {
-// // Set pose to (-36, -60, 0);
-
-// chassis.turnTo(-60, -36, 1000, true, 60); // true = face that direction w/ front of bot
-// chassis.moveTo(-60, -36, 315, 4000, true);
-// chassis.turnTo(-60, 24, 1000, true, 60);
-// chassis.moveTo(-60, -24, 0, 4000, true);
-// chassis.moveTo(-60, -36, 0, 4000, false); // false = not forward
-// chassis.turnTo(-48, -48, 1000, true, 60);
-// chassis.moveTo(-48, -48, 135, 4000, true);
-// pros::delay(20);
-// chassis.turnTo(50, -23, 1000, false, 60);
-
-// Intake = 100; 
-// chassis.moveTo(-60, -51, 250, 4000);
-// pros::delay(200); // failed here, need longer time delay
-// Intake = 0;
-
-// Catapult = 127;
-// pros::delay(42000);
-// Catapult = 0;
-
-
-// chassis.turnTo(-36, -60, 1000, true, 60); // failed here sometimes idk why
-// chassis.moveTo(-36, -60, 120, 4000, true);
-// chassis.turnTo(35, -60, 1000, true, 60);
-// chassis.moveTo(38, -60, 90, 4000, true);
-
-// chassis.turnTo(60, -24, 1000, true, 60);
-// chassis.moveTo(60, -24, 45, 4000, true);
-// chassis.moveTo(48, -48, 45, 4000, true, 0.0, 0.001);
-
-// chassis.turnTo(10, 0, 1000, true, 60);
-// chassis.moveTo(10, 0, 315, 4000, true);
-// chassis.turnTo(50, 0, 1000, true, 60);
-// chassis.moveTo(50, 0, 90, 4000, true);
-// chassis.moveTo(10, -10, 60, 4000, false, 0.0, 0.001);
-// chassis.moveTo(44, -12, 75, 4000, true);
-// chassis.moveTo(8, 12, 150, 4000, false, 0.0, 0.001);
-// chassis.moveTo(46, 10, 0, 4000, true);
-// ----------------------------------------------------------------------------------------
-// Red but on blue side: yeet triball at goal + touch bar + 2 in goal
-// start at (-60,-36) heading 235 and preload in low-arc platfrorm
-Intake = 105;
-pros::delay(100);
-Intake = 0;
-
-Catapult = 127;
-pros::delay(1000);
-Catapult = 0;
-
-Intake = -105;
-pros::delay(350);
-Intake = 0;
-
-chassis.turnTo(-24, 0, 1000, true, 60);
-Intake = -105;
-chassis.moveTo(-24, -4, 180, 4000, true);
-pros::delay(100);
-Intake = 105;
-pros::delay(300);
-Intake = 0;
-chassis.turnTo(-48, -11, 1000, true, 60);
-pros::delay(100);
-Intake = -105;
-pros::delay(400);
-Intake = 0;
-chassis.moveTo(-48, -11, 250, 2000, true);
-chassis.moveTo(-52, -11, 270, 1000, true);
-
-chassis.moveTo(-12, -12, 270, 2000, false, 0.0, 0.001);
-chassis.turnTo(-4, 0, 1000, true, 60);
-Intake = 30;
-chassis.moveTo(5, -3, 45, 1000, true);
-Intake = 105;
-pros::delay(100);
-Intake = 0;
-chassis.turnTo(-48, -12, 1000, true, 60);
-Intake = -105;
-pros::delay(300);
-Intake = 0;
-chassis.moveTo(-48, -12, 265, 2000, true);
-chassis.moveTo(-52, -12, 265, 500, true);
-chassis.moveTo(-35, -12, 270, 2000, false, 0.0, 0.001);
-chassis.turnTo(-4, -43, 1000, true, 60);
-chassis.moveTo(-4, -43, 145, 2000, true);
-Intake = 105;
-pros::delay(500);
-Intake = 0;
+// Set pose to (36, -60, 0);
+//AWP: Offensive Side
+        Intake = 127; //Grab Preload
+chassis.turnTo(30, -12, 500, true, 80);
+chassis.moveTo(30, -12, 350, 1500, true);
+chassis.turnTo(44, -12, 1000, true, 60);
+        chassis.waitUntilDone();
+        Intake = -127; 
+        pros::delay(500);
+        Intake = 0; 
+chassis.moveTo(49, -12, 90, 1000, true); // Push preload into goal
+chassis.moveTo(12, -12, 90, 1500, false, 0.0, 0.001);
+chassis.turnTo(3, 1, 1000, true, 60); 
+chassis.moveTo(3, 1, -50, 1500, true, 0.0, 0.001); // Move to far triball by the middle barrier
+        chassis.waitUntilDone();
+        Intake = 127; // Grab triball
+        pros::delay(500);
+chassis.turnTo(52, 6, 1000, true, 60);
+        chassis.waitUntilDone();
+        Intake = -127; 
+        Intake = -127; 
+chassis.moveTo(52, 6, 81, 2000, true, 0.0, 0.001);// Move at a slight angle to push the middle one too
+chassis.moveTo(30, 6, 90, 500, false, 0.0, 0.001, 127); // move away from goal?
+chassis.turnTo(5, -42, 1000, true, 60); // turn to vertical bar without going around the side bars
+chassis.moveTo(5, -42, 220, 1500, true, 0.0, 0.001, 80);
+        chassis.waitUntilDone(); //start putting intake down after got to bar
+        Intake = 100; 
+// Total: +15 in goal, touched bar, red triball in red goal
 }
 
 void opcontrol() {    
@@ -284,7 +223,6 @@ CataOn = true;
         Catapult = 0; // If none of the conditions are somehow met, just don't move the catapult
     }
 }
-    
     pros::delay(10); // Brain only updates every 10 ms
   }
 }

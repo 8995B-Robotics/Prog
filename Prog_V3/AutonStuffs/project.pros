@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "RedOnBlueSide",
+    "project_name": "AWP_Off_Single",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -347,7 +347,8 @@
     },
     "upload_options": {
       "slot": 5,
-      "description": "something"
+      "description": "Single Stick + Awp on offensive side",
+      "icon": "pizza"
     }
   }
 }
